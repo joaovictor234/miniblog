@@ -19,14 +19,31 @@ export const CreatePost = () => {
     e.preventDefault();
     setFormError("");
 
+    //vaidate image URL
+    try {
+      new URL(image);
+    } catch (error) {
+      setFormError("A imagem precisa ser uma URL.")
+    }
+
+    //criar o array de tags
+    const tagsArray = tags.split(",").map(tag => tag.trim().toLowerCase());
+
+    //checar todos os valores
+    if(!title || !image || !tags || !body)
+      setFormError("Por favor, preencha todos os campos.")
+
+    if(formError) return;
+
     await insertDocument({
       title,
       image,
       body,
-      tags,
+      tagsArray,
       uid: user.uid,
       createdBy: user.displayName
     })
+
     navigate('/')
   }
 
@@ -77,6 +94,7 @@ export const CreatePost = () => {
         {!response.loading && <button className='btn'>Postar</button>}
         {response.loading && <button className='btn' disabled>Aguarde...</button>}
         {response.error && <p className='error'>{response.error}</p>}
+        {formError && <p className='error'>{formError}</p>}
       </form>
     </div>
   )
